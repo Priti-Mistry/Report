@@ -1,0 +1,201 @@
+# POST http://localhost:5000/eventBooking/event-bookings
+# content-type: application/json
+
+# {
+#       "guestID": 5,
+#         "eventDate": "2024-06-20T20:00:00",
+#         "eventType": "Concert",
+#         "numberOfAttendees": 200
+# }
+
+# POST http://localhost:5000/getColReservation/fetchDataByColumns
+# content-type: application/json
+
+# {
+#     "selectedColumns": ["status","firstName","lastName"]
+# }
+
+
+GET http://localhost:5000/getColReservation/columns
+
+# GET http://localhost:5000/getColReservation/gettingAllColumnsData
+
+# GET http://localhost:5000/reservation/allDetailsWithGuest
+# GET http://localhost:5000/allCols/columns
+# POST http://localhost:5000/allCols/data/Hotel
+# content-type: application/json
+
+# {
+#     "selectedColumns": ["hotelName","address","description"]
+# }
+
+
+
+
+
+# POST http://localhost:5000/hotel/hotel-information
+# content-type: application/json
+
+# {
+#     "hotelName": "Urban Oasis",
+#     "address": "222 Downtown Street",
+#     "contactInformation": "555-7890",
+#     "description": "City chic ",
+#     "amenities": "Rooftop Bar, Fitness Center"
+# }
+# POST http://localhost:5000/roomType/room-types
+# content-type: application/json
+
+# {
+#     "typeName": "Cottage",
+#     "description": "Quaint cottage retreat",
+#     "price": "120"
+# }
+# POST http://localhost:5000/room/rooms
+# content-type: application/json
+
+# {
+#     "roomNumber": "402",
+#     "roomTypeID": 3,
+#     "status": "available"
+# }
+# POST http://localhost:5000/guest/guests
+# content-type: application/json
+
+# {
+#     "firstName": "Michael",
+#     "lastName": "Lee",
+#     "address": "222 Cedar Drive",
+#     "contactInformation": "555-5555",
+#     "email": "michael@example.com",
+#     "nationality": "France"
+# }
+# POST http://localhost:5000/reservation/reservations
+# content-type: application/json
+
+# {
+#     "guestID": 6,
+#     "roomID": 5,
+#     "checkInDate": "2024-05-20",
+#     "checkOutDate": "2024-05-25",
+#     "totalPrice": "600",
+#     "status": "confirmed"
+
+# }
+# POST http://localhost:5000/roomServiceOrder/room-service-orders
+# content-type: application/json
+
+# {
+#    "roomID": 5,
+#         "guestID": 5,
+#         "orderDate": "2024-06-12",
+#         "status": "pending"
+# }
+# POST http://localhost:5000/staff/staff
+# content-type: application/json
+
+# {
+#     "firstName": "Emma",
+#         "lastName": "Wilson",
+#         "position": "Chef",
+#         "contactInformation": "555-0000"
+# }
+# POST http://localhost:5000/feedback/feedback
+# content-type: application/json
+
+# {
+#     "guestID": 5,
+#         "feedbackDate": "2024-06-12T18:00:00",
+#         "feedbackDescription": "Enjoyed the amenities.",
+#         "rating": 4
+# }
+
+# import React, { useEffect, useState } from 'react';
+# import { useDispatch, useSelector } from 'react-redux';
+# import { Checkbox } from 'antd';
+# import DataTable from 'react-data-table-component';
+# import Sider from 'antd/es/layout/Sider';
+# import axios from 'axios'
+
+# const siderStyle = {
+#   textAlign: 'center',
+#   lineHeight: '20px',
+#   color: '#000',
+#   backgroundColor: '#fff',
+# };
+
+# function SideBar() {
+#   const dispatch = useDispatch();
+#   const columns = useSelector((state) => state.columns.columns);
+#   const [cols, setCols] = useState([]);
+#   const [selectedCols, setSelectedCols] = useState({});
+#   const [selectedCol,setSelectedCol]=useState([]);
+#   const [tableData, setTableData] = useState([]);
+
+#   useEffect(() => {
+#     setCols(Object.values(columns).reduce((acc, curr) => [...acc, ...curr], []));
+#     console.log(selectedCol)
+#   }, [columns,selectedCol]);
+
+#   const onChange = (e, tableName) => {
+#     const { name, checked } = e.target;
+#     setSelectedCols(prevState => ({
+#       ...prevState,
+#       [tableName]: checked ? [...(prevState[tableName] || []), name] : prevState[tableName].filter(col => col !== name)
+#     }));
+#     setSelectedCol(checked ? [...selectedCol, name] : selectedCol.filter(col => col !== name));
+#   };
+
+#   const fetchData = async () => {
+#     try {
+#       const tableDataArray = [];
+#       for (const [tableName, selectedColumns] of Object.entries(selectedCols)) {
+#         const response = await axios.post(`http://localhost:5000/allCols/data/${tableName}`, { selectedColumns });
+#         tableDataArray.push({ tableName, data: response.data });
+#       }
+#       setTableData(tableDataArray);
+#     } catch (error) {
+#       console.error(error);
+#     }
+#   };
+
+#   const tableColumns = selectedCol && selectedCol.map((col) => ({
+#     name: col,
+#     selector: col,
+#     sortable: true,
+#   }));
+
+#   return (
+#     <>
+#       <Sider width="25%" style={siderStyle}>
+#       <ul>
+#               {Object.entries(columns).map(([tableName, tableColumns]) => (
+#                     <li key={tableName}>
+#                         <h3>{tableName}</h3>
+#                         <ul>
+#                             {tableColumns.map((column) => (
+#                                 <Checkbox key={column} name={column} onChange={(e) => onChange(e, tableName)}>{column}</Checkbox>
+#                             ))}
+#                         </ul>
+#                     </li>
+#                 ))}
+#             </ul>
+#       </Sider>
+#       <div width="65%">
+#       <button onClick={fetchData}>Fetch Data</button>
+#       {tableData.map(({ tableName, data }) => (
+#         <DataTable
+#           key={tableName}
+#           columns={tableColumns}
+#           data={data}
+#         />
+#       ))}
+#       </div>
+#     </>
+#   );
+# }
+
+# export default SideBar;
+
+
+
